@@ -322,19 +322,34 @@ if (anvilElement) {
 
 
 // 5. نظام التنقل والتبديل بين الـ 4 شاشات
-function showScreen(activeBtn, screenToShow) {
-    [mineScreen, upgradesScreen, marketScreen, tasksScreen, friendsScreen].forEach(s => s?.classList.add('hidden'));
-    [btnMine, btnUpgrades, btnMarket, btnTasks, btnFriends].forEach(b => b?.classList.remove('active'));
-    
-    screenToShow?.classList.remove('hidden');
-    activeBtn?.classList.add('active');
+function showTab(screenId, btnId) {
+    // 1. إخفاء جميع الشاشات
+    const allScreens = ['mine-screen', 'upgrades-section', 'market-section', 'tasks-screen', 'friends-screen'];
+    allScreens.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+    });
+
+    // 2. إلغاء التحديد (active) من جميع أزرار القائمة السفلية
+    document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+
+    // 3. إظهار الشاشة المطلوبة وتفعيل الزر الخاص بها
+    const targetScreen = document.getElementById(screenId);
+    const targetBtn = document.getElementById(btnId);
+
+    if (targetScreen) targetScreen.classList.remove('hidden');
+    if (targetBtn) targetBtn.classList.add('active');
 }
 
-btnMine.addEventListener('click', () => showScreen(btnMine, mineScreen));
-btnUpgrades.addEventListener('click', () => showScreen(btnUpgrades, upgradesScreen));
-btnMarket.addEventListener('click', () => showScreen(btnMarket, marketScreen));
-btnTasks.addEventListener('click', () => showScreen(btnTasks, tasksScreen));
-btnFriends.addEventListener('click', () => showScreen(btnFriends, friendsScreen));
+document.addEventListener('DOMContentLoaded', () => {
+    
+    document.getElementById('btn-mine')?.addEventListener('click', () => showTab('mine-screen', 'btn-mine'));
+    document.getElementById('btn-upgrades')?.addEventListener('click', () => showTab('upgrades-section', 'btn-upgrades'));
+    document.getElementById('btn-market')?.addEventListener('click', () => showTab('market-section', 'btn-market'));
+    document.getElementById('btn-tasks')?.addEventListener('click', () => showTab('tasks-screen', 'btn-tasks'));
+    document.getElementById('btn-friends')?.addEventListener('click', () => showTab('friends-screen', 'btn-friends'));
+
+});
 
 // 6. شراء الترقيات
 document.getElementById('buy-click-upgrade').addEventListener('click', () => {
