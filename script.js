@@ -35,6 +35,97 @@ const btnTasks = document.getElementById('btn-tasks');
 const btnFriends = document.getElementById('btn-friends');
 
 // الترقيات والأسعار
+// بيانات اللعبة والترقيات
+let gameData = {
+    balance: 62,          // الرصيد الحالي
+    profitPerHour: 150,   // الربح بالساعة
+    clickPower: 1,        // قوة النقرة
+    
+    pickaxe: {
+        level: 1,
+        cost: 50,
+        powerBonus: 1,
+        costMultiplier: 1.5 // زيادة السعر مع كل ترقية
+    },
+    furnace: {
+        level: 1,
+        cost: 200,
+        profitBonus: 50,
+        costMultiplier: 1.6
+    }
+};
+
+// دالة شراء الترقيات
+function buyUpgrade(type) {
+    let item = gameData[type];
+    
+    if (gameData.balance >= item.cost) {
+        // خصم التكلفة من الرصيد
+        gameData.balance -= item.cost;
+        
+        // تطبيق تأثير الترقية
+        if (type === 'pickaxe') {
+            gameData.clickPower += item.powerBonus;
+            item.level++;
+            item.cost = Math.floor(item.cost * item.costMultiplier);
+            
+            // تحديث الواجهة للمعول
+            document.getElementById('pickaxe-level').innerText = item.level;
+            document.getElementById('pickaxe-cost').innerText = item.cost;
+        } 
+        else if (type === 'furnace') {
+            gameData.profitPerHour += item.profitBonus;
+            item.level++;
+            item.cost = Math.floor(item.cost * item.costMultiplier);
+            
+            // تحديث الواجهة للفرن
+            document.getElementById('furnace-level').innerText = item.level;
+            document.getElementById('furnace-cost').innerText = item.cost;
+            // إذا كان لديك عنصر يعرض الربح/ساعة في الأعلى:
+            // document.getElementById('profit-display').innerText = gameData.profitPerHour + '+';
+        }
+        
+        // تحديث الرصيد العام في الشاشة
+        updateBalanceDisplay();
+        
+        // إظهار رسالة نجاح سريعة
+        showToast("✨ تمت الترقية بنجاح!");
+    } else {
+        showToast("❌ رصيدك غير كافٍ!", "error");
+    }
+}
+
+// تحديث عرض الرصيد في الشاشة الرئيسية
+function updateBalanceDisplay() {
+    const balanceEl = document.getElementById('balance-display'); // تأكد من مطابقة الـ ID لديك
+    if (balanceEl) balanceEl.innerText = gameData.balance;
+}
+
+// دالة إظهار التنبيهات المؤقتة (Toast)
+function showToast(message, type = "success") {
+    let toast = document.createElement('div');
+    toast.innerText = message;
+    toast.style.position = 'fixed';
+    toast.style.top = '30px';
+    toast.style.left = '50%';
+    toast.style.transform = 'translateX(-50%)';
+    toast.style.background = type === 'success' ? 'rgba(16, 185, 129, 0.9)' : 'rgba(239, 68, 68, 0.9)';
+    toast.style.color = '#fff';
+    toast.style.padding = '10px 20px';
+    toast.style.borderRadius = '20px';
+    toast.style.fontSize = '14px';
+    toast.style.fontWeight = 'bold';
+    toast.style.zIndex = '99999';
+    toast.style.backdropFilter = 'blur(5px)';
+    toast.style.boxShadow = '0 5px 15px rgba(0,0,0,0.3)';
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 2000);
+}
+
 const clickUpgradeCostDisplay = document.getElementById('click-upgrade-cost');
 const passiveUpgradeCostDisplay = document.getElementById('passive-upgrade-cost');
 
