@@ -20,6 +20,7 @@
             background-attachment: fixed;
             font-family: 'Arial', sans-serif;
             color: white;
+            padding-bottom: 80px;
             user-select: none; /* لمنع تحديد النصوص بالخطأ */
         }
 
@@ -127,17 +128,32 @@
 
         /* ================= 4. ألوان القائمة السفلية ================= */
         .bottom-nav {
-            background-color: #161c24; /* لون كحلي داكن مقارب للصور */
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+    position: fixed;         /* تثبيت العنصر على الشاشة */
+    bottom: 0;               /* لصق العنصر في الحافة السفلية */
+    left: 0;
+    width: 100%;             /* جعل القائمة بعرض الشاشة بالكامل */
+    background-color: #161c24; 
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 999;            /* إبقاء القائمة فوق أي عنصر آخر في اللعبة */
+    
+    /* تنسيق الأزرار بجوار بعضها (أضفها إذا لم تكن موجودة) */
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px 0;         /* مسافة داخلية لضبط حجم القائمة */
         }
         
-        .nav-item {
-            color: #7b889b;
-        }
-        
-        .nav-item.active {
-            color: #fbd462; /* تلوين الأيقونة المفعلة باللون الذهبي */
-        }
+        nav-item {
+    color: #7b889b;
+    text-align: center;
+    cursor: pointer;
+    /* التخلص من تأثير التحديد الأزرق عند الضغط في الهواتف */
+    -webkit-tap-highlight-color: transparent; 
+}
+
+.nav-item.active {
+    color: #fbd462; /* تلوين الأيقونة المفعلة باللون الذهبي */
+}
         
         /* ⚠️ احتفظ بباقي أكواد الـ CSS القديمة الخاصة بالمهام والترقيات والأصدقاء تحت هذا السطر ⚠️ */
 
