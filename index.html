@@ -1,69 +1,64 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ember: Forge & Mine</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Ember / Ruby Game</title>
     
+    <!-- ================= بداية أكواد CSS ================= -->
     <style>
-        /* --- 1. التنسيقات الأساسية --- */
-        * {
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
+            /* رابط الخلفية أو صورة المنجم */
+            background-color: #121212; /* لون احتياطي */
+            background-image: url('bg-image.jpg'); /* تأكد من اسم صورة الخلفية لديك */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            font-family: 'Arial', sans-serif;
+            color: white;
+            user-select: none; /* لمنع تحديد النصوص بالخطأ */
         }
 
-         body {
-               margin: 0;
-               padding: 0;
-               background-image: url('bg-image.jpg'); /* رابط صورة الخلفية */
-               background-size: cover;
-               background-position: center;
-               background-repeat: no-repeat;
-               background-attachment: fixed;
-               font-family: 'Arial', sans-serif;
-               color: white;
-               }
-
-
-
-        .game-container {
-            width: 100%;
-            max-width: 480px;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            position: relative;
+        /* فئة أساسية لإخفاء الشاشات عند التنقل */
+        .hidden {
+            display: none !important;
         }
 
-        /* --- 2. شريط الإحصائيات العلوي --- */
-        .top-bar {
+        /* ================= 1. شريط الإحصائيات العلوي ================= */
+        .header-stats {
             display: flex;
             justify-content: space-between;
-            padding: 20px;
-            background-color: rgba(255, 255, 255, 0.05);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px 30px 10px 30px;
         }
 
-        .stat {
+        .stat-box {
             display: flex;
             flex-direction: column;
-            align-items: center;
         }
 
-        .stat .label {
-            font-size: 0.8rem;
-            color: #aaaaaa;
+        .stat-box.left {
+            align-items: flex-start;
         }
 
-        .stat .value {
-            font-size: 1.8rem;
+        .stat-box.right {
+            align-items: flex-end;
+        }
+
+        .stat-title {
+            font-size: 16px;
+            color: #e0c080; /* لون ذهبي باهت */
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 32px;
             font-weight: bold;
-            color: #fca311;
+            color: #fbd462; /* لون ذهبي ساطع */
+            text-shadow: 0 0 10px rgba(251, 212, 98, 0.4); /* توهج خفيف للأرقام */
         }
 
         /* --- 3. نظام الشاشات --- */
@@ -78,36 +73,73 @@
             display: none !important;
         }
 
-        /* --- 4. شاشة التعدين والزر الرئيسي --- */
+        /* ================= 2. منطقة الإطار والسندان ================= */
+        .clicker-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 8vh; /* لضبط المسافة من الأعلى */
+        }
+
+        .clicker-frame {
+            width: 280px;
+            height: 280px;
+            border: 4px solid #ffffff; /* الإطار الأبيض المطلوب */
+            border-radius: 40px;
+            background-color: transparent; /* خلفية شفافة */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.6);
+            transition: transform 0.1s ease;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* حركة الضغط على الإطار */
+        .clicker-frame:active {
+            transform: scale(0.94);
+        }
+
+        .clicker-frame img {
+            width: 90%;
+            height: 90%;
+            object-fit: contain;
+            filter: drop-shadow(0 15px 15px rgba(0,0,0,0.8)); /* ظل مجسم للسندان */
+            pointer-events: none;
+        }
+
+        /* ================= 3. الأرقام المتطايرة عند النقر ================= */
+        .floating-number {
+            position: absolute;
+            font-size: 26px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 8px #fbd462;
+            pointer-events: none;
+            animation: floatUp 1s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-70px) scale(1.2); }
+        }
+
+        /* ================= 4. ألوان القائمة السفلية ================= */
+        .bottom-nav {
+            background-color: #161c24; /* لون كحلي داكن مقارب للصور */
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
         
-
-/* تعديل زر النقر ليصبح شفافاً ويستوعب الصورة */
-#main-clicker {
-    background: transparent;
-    box-shadow: none; /* إزالة الوهج القديم */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 250px;
-    height: 250px;
-    margin: 40px auto;
-}
-
-/* تنسيق صورة الفرن الجديدة */
-#forge-img {
-    width: 100%;
-    height: 100%;
-    background: transparent;
-    border-radius: 50%;
-    object-fit: contain;
-    filter: drop-shadow(0 0 20px rgba(255, 100, 0, 0.7)); /* إضافة توهج للصورة نفسها */
-    transition: transform 0.1s ease; /* حركة الضغط */
-}
-
-#main-clicker:active #forge-img {
-    transform: scale(0.95);
-}
-
+        .nav-item {
+            color: #7b889b;
+        }
+        
+        .nav-item.active {
+            color: #fbd462; /* تلوين الأيقونة المفعلة باللون الذهبي */
+        }
+        
+        /* ⚠️ احتفظ بباقي أكواد الـ CSS القديمة الخاصة بالمهام والترقيات والأصدقاء تحت هذا السطر ⚠️ */
 
         /* --- 5. الكروت (ترقيات، مهام، أصدقاء) --- */
         .upgrades-list, .tasks-list, .friends-list {
@@ -206,10 +238,159 @@
             font-size: 0.95rem;
             margin-bottom: 10px;
             color: #aaaaaa;
-        }
+            }
+        
+    </style>
+    <!-- ================= نهاية أكواد CSS ================= -->
+</head>
+<body>
+
+    <!-- ================= شاشة التعدين (تظهر وتختفي ككتلة واحدة) ================= -->
+    <div id="mine-screen">
+        
+        <!-- الإحصائيات -->
+        <div class="header-stats">
+            <div class="stat-box left">
+                <span class="stat-title">الربح/ساعة</span>
+                <!-- الـ id هنا مطابق لملف الـ JavaScript -->
+                <span id="profit-display" class="stat-value">+150</span>
+            </div>
+            <div class="stat-box right">
+                <span class="stat-title">الرصيد</span>
+                <!-- الـ id هنا مطابق لملف الـ JavaScript -->
+                <span id="score" class="stat-value">52</span>
+            </div>
+        </div>
+
+        <!-- منطقة السندان -->
+        <div class="clicker-wrapper">
+            <!-- الـ id هنا (main-clicker) هو ما يستمع إليه الجافاسكريبت للنقر -->
+            <div id="main-clicker" class="clicker-frame">
+                <img src="forge-img.jpg" id="forge-img" alt="Forge" />
+            </div>
+        </div>
+        
+    </div>
+    <!-- ================= نهاية شاشة التعدين ================= -->
+    
+
+    <!-- ================= باقي شاشات اللعبة (احتفظ بأكوادك هنا كما هي) ================= -->
+    
+    <div id="upgrades-screen" class="hidden">
+        <!-- كود شاشة الترقيات الخاص بك -->
+        <div class="upgrades-list">
+                <h2 class="section-title">تطوير أدوات التعدين</h2>
+                <div class="upgrade-card">
+                    <div class="upgrade-info">
+                        <span class="upgrade-icon">⛏️</span>
+                        <div>
+                            <h3>معول حديدي</h3>
+                            <p>يزيد قوة النقرة (+1 نقدة)</p>
+                        </div>
+                    </div>
+                    <button class="buy-button" id="buy-click-upgrade">
+                        <span class="cost-val" id="click-upgrade-cost">50</span> 💰
+                    </button>
+                </div>
+                <div class="upgrade-card">
+                    <div class="upgrade-info">
+                        <span class="upgrade-icon">🌋</span>
+                        <div>
+                            <h3>فرن مطور</h3>
+                            <p>يزيد التعدين التلقائي (+50/ساعة)</p>
+                        </div>
+                    </div>
+                    <button class="buy-button" id="buy-passive-upgrade">
+                        <span class="cost-val" id="passive-upgrade-cost">200</span> 💰
+                    </button>
+                </div>
+        </div>
+    </div>
+
+    <div id="tasks-screen" class="hidden">
+        <!-- كود شاشة المهام الخاص بك -->
+        <div class="tasks-list">
+                <h2 class="section-title">مهام مجتمعية</h2>
+                <div class="task-card">
+                    <div class="task-info">
+                        <span class="task-icon">📢</span>
+                        <div>
+                            <h3>اشترك في قناة التليجرام</h3>
+                            <p>احصل على +1000 عملة</p>
+                        </div>
+                    </div>
+                    <button class="claim-button" id="task-tg">ابدأ</button>
+                </div>
+                <div class="task-card">
+                    <div class="task-info">
+                        <span class="task-icon">📺</span>
+                        <div>
+                            <h3>شاهد فيديو الشرح</h3>
+                            <p>احصل على +500 عملة</p>
+                        </div>
+                    </div>
+                    <button class="claim-button" id="task-yt">ابدأ</button>
+                </div>
+        </div>
+    </div>
+
+    <div id="friends-screen" class="hidden">
+        <!-- كود شاشة الأصدقاء الخاص بك -->
+        <div class="friends-list">
+                <h2 class="section-title">دعوة الأصدقاء</h2>
+                
+                <div class="invite-box">
+                    <h4>انشر اللعبة واربح الملايين!</h4>
+                    <p>ستحصل أنت وصديقك على +5,000 عملة فور انضمامه للعبة عن طريقك.</p>
+                    <button class="share-btn" id="btn-invite-friend">دعوة صديق 🔗</button>
+                </div>
+
+                <p class="friends-count">قائمة أصدقائك (0):</p>
+                <!-- قائمة وهمية للمعاينة الحالية -->
+                <div class="friend-card">
+                    <div class="friend-info">
+                        <span class="friend-icon">👤</span>
+                        <div>
+                            <h3>أحمد محمد (تجريبي)</h3>
+                            <p>نشط • ساهم بـ +5,000</p>
+                        </div>
+                    </div>
+                    <span style="color: #2a9d8f; font-weight: bold;">+5K 💰</span>
+                </div>
+        </div>
+    </div>
+
+    <!-- ================= القائمة السفلية (احتفظ بكودك هنا كما هو) ================= -->
+    <!-- <nav class="bottom-nav"> ... </nav> -->
+    <nav class="bottom-nav">
+            <button class="nav-item active" id="btn-mine">
+                <span class="icon">⛏️</span>
+                <span>تعدين</span>
+            </button>
+            <button class="nav-item" id="btn-upgrades">
+                <span class="icon">🚀</span>
+                <span>ترقيات</span>
+            </button>
+            <button class="nav-item" id="btn-tasks">
+                <span class="icon">📋</span>
+                <span>مهام</span>
+            </button>
+            <button class="nav-item" id="btn-friends">
+                <span class="icon">👥</span>
+                <span>أصدقاء</span>
+            </button>
+    </nav>
+
+    <!-- ربط ملف الجافاسكريبت -->
+    <script src="script.js"></script>
+</body>
+</html>
+
+
+        
 
         /* --- 6. شريط التنقل السفلي --- */
-        .bottom-nav {
+        /*.bottom-nav {
             display: flex;
             justify-content: space-around;
             padding: 12px 10px;
@@ -241,10 +422,10 @@
         .nav-item span:last-child {
             font-size: 0.8rem;
             font-weight: bold;
-        }
+        } */
 
         /* --- 7. الأرقام المتطايرة --- */
-        .floating-number {
+        /* .floating-number {
             position: absolute;
             color: #ffffff;
             font-size: 2rem;
@@ -253,141 +434,9 @@
             transform: translate(-50%, -50%);
             animation: floatUp 1s ease-out forwards;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
+        } */
 
-        @keyframes floatUp {
+      /*  @keyframes floatUp {
             0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
             100% { opacity: 0; transform: translate(-50%, -150px) scale(1.5); }
-        }
-    </style>
-</head>
-<body>
-    <div class="game-container">
-        
-        <!-- شريط الإحصائيات العلوي -->
-        <header class="top-bar">
-            <div class="stat">
-                <span class="label">الرصيد</span>
-                <span class="value" id="score">0</span>
-            </div>
-            <div class="stat">
-                <span class="label">الربح/ساعة</span>
-                <span class="value" id="profit-display">+150</span>
-            </div>
-        </header>
-
-        <!-- 1. شاشة التعدين الرئيسية -->
-        <!-- بدلاً من الإيموجي والدائرة القديمة -->
-        <div id="main-clicker" class="clicker-area">
-           <img src="forge-img.jpg" id="forge-img" alt="Forge" />
-        </div>
-
-
-        <!-- 2. شاشة المتجر والترقيات -->
-        <main id="upgrades-screen" class="game-screen hidden">
-            <div class="upgrades-list">
-                <h2 class="section-title">تطوير أدوات التعدين</h2>
-                <div class="upgrade-card">
-                    <div class="upgrade-info">
-                        <span class="upgrade-icon">⛏️</span>
-                        <div>
-                            <h3>معول حديدي</h3>
-                            <p>يزيد قوة النقرة (+1 نقدة)</p>
-                        </div>
-                    </div>
-                    <button class="buy-button" id="buy-click-upgrade">
-                        <span class="cost-val" id="click-upgrade-cost">50</span> 💰
-                    </button>
-                </div>
-                <div class="upgrade-card">
-                    <div class="upgrade-info">
-                        <span class="upgrade-icon">🌋</span>
-                        <div>
-                            <h3>فرن مطور</h3>
-                            <p>يزيد التعدين التلقائي (+50/ساعة)</p>
-                        </div>
-                    </div>
-                    <button class="buy-button" id="buy-passive-upgrade">
-                        <span class="cost-val" id="passive-upgrade-cost">200</span> 💰
-                    </button>
-                </div>
-            </div>
-        </main>
-
-        <!-- 3. شاشة المهام -->
-        <main id="tasks-screen" class="game-screen hidden">
-            <div class="tasks-list">
-                <h2 class="section-title">مهام مجتمعية</h2>
-                <div class="task-card">
-                    <div class="task-info">
-                        <span class="task-icon">📢</span>
-                        <div>
-                            <h3>اشترك في قناة التليجرام</h3>
-                            <p>احصل على +1000 عملة</p>
-                        </div>
-                    </div>
-                    <button class="claim-button" id="task-tg">ابدأ</button>
-                </div>
-                <div class="task-card">
-                    <div class="task-info">
-                        <span class="task-icon">📺</span>
-                        <div>
-                            <h3>شاهد فيديو الشرح</h3>
-                            <p>احصل على +500 عملة</p>
-                        </div>
-                    </div>
-                    <button class="claim-button" id="task-yt">ابدأ</button>
-                </div>
-            </div>
-        </main>
-
-        <!-- 4. شاشة الأصدقاء الجديدة -->
-        <main id="friends-screen" class="game-screen hidden">
-            <div class="friends-list">
-                <h2 class="section-title">دعوة الأصدقاء</h2>
-                
-                <div class="invite-box">
-                    <h4>انشر اللعبة واربح الملايين!</h4>
-                    <p>ستحصل أنت وصديقك على +5,000 عملة فور انضمامه للعبة عن طريقك.</p>
-                    <button class="share-btn" id="btn-invite-friend">دعوة صديق 🔗</button>
-                </div>
-
-                <p class="friends-count">قائمة أصدقائك (0):</p>
-                <!-- قائمة وهمية للمعاينة الحالية -->
-                <div class="friend-card">
-                    <div class="friend-info">
-                        <span class="friend-icon">👤</span>
-                        <div>
-                            <h3>أحمد محمد (تجريبي)</h3>
-                            <p>نشط • ساهم بـ +5,000</p>
-                        </div>
-                    </div>
-                    <span style="color: #2a9d8f; font-weight: bold;">+5K 💰</span>
-                </div>
-            </div>
-        </main>
-
-        <!-- شريط التنقل السفلي -->
-        <nav class="bottom-nav">
-            <button class="nav-item active" id="btn-mine">
-                <span class="icon">⛏️</span>
-                <span>تعدين</span>
-            </button>
-            <button class="nav-item" id="btn-upgrades">
-                <span class="icon">🚀</span>
-                <span>ترقيات</span>
-            </button>
-            <button class="nav-item" id="btn-tasks">
-                <span class="icon">📋</span>
-                <span>مهام</span>
-            </button>
-            <button class="nav-item" id="btn-friends">
-                <span class="icon">👥</span>
-                <span>أصدقاء</span>
-            </button>
-        </nav>
-
-    </div>
-    <script src="script.js"></script>
-</body>
-</html>
+        } */
