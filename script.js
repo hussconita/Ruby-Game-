@@ -26,11 +26,13 @@ const mainClicker = document.getElementById('main-clicker');
 
 const mineScreen = document.getElementById('mine-screen');
 const upgradesScreen = document.getElementById('upgrades-screen');
+const marketScreen = document.getElementById('market-screen');
 const tasksScreen = document.getElementById('tasks-screen');
 const friendsScreen = document.getElementById('friends-screen');
 
 const btnMine = document.getElementById('btn-mine');
 const btnUpgrades = document.getElementById('btn-upgrades');
+const btnMarket = document.getElementById('btn-market');
 const btnTasks = document.getElementById('btn-tasks');
 const btnFriends = document.getElementById('btn-friends');
 
@@ -321,8 +323,8 @@ if (anvilElement) {
 
 // 5. نظام التنقل والتبديل بين الـ 4 شاشات
 function showScreen(activeBtn, screenToShow) {
-    [mineScreen, upgradesScreen, tasksScreen, friendsScreen].forEach(s => s?.classList.add('hidden'));
-    [btnMine, btnUpgrades, btnTasks, btnFriends].forEach(b => b?.classList.remove('active'));
+    [mineScreen, upgradesScreen, marketScreen, tasksScreen, friendsScreen].forEach(s => s?.classList.add('hidden'));
+    [btnMine, btnUpgrades, btnMarket, btnTasks, btnFriends].forEach(b => b?.classList.remove('active'));
     
     screenToShow?.classList.remove('hidden');
     activeBtn?.classList.add('active');
@@ -330,6 +332,7 @@ function showScreen(activeBtn, screenToShow) {
 
 btnMine.addEventListener('click', () => showScreen(btnMine, mineScreen));
 btnUpgrades.addEventListener('click', () => showScreen(btnUpgrades, upgradesScreen));
+btnMarket.addEventListener('click', () => showScreen(btnMarket, marketScreen));
 btnTasks.addEventListener('click', () => showScreen(btnTasks, tasksScreen));
 btnFriends.addEventListener('click', () => showScreen(btnFriends, friendsScreen));
 
@@ -396,3 +399,112 @@ document.getElementById('btn-invite-friend').addEventListener('click', () => {
 
 // 9. تشغيل جلب البيانات تلقائياً عند فتح اللعبة
 loadPlayerData();
+
+//10. إضافة الموارد والمخزن إلى بيانات اللعبة الرئيسية
+gameData.inventory = gameData.inventory || { ruby: 0, coal: 0 };
+
+let marketState = {
+    ruby: { price: 50, history: [48, 49, 50, 51, 50], change: 0 },
+    coal: { price: 12, history: [10, 11, 12, 11, 12], change: 0 }
+};
+
+// 1. دالة تحديث الأسعار بشكل حي (شغالة كل 4 ثوانٍ)
+function startMarketFluctuations() {
+    setInterval(() => {
+        updateResourcePrice('ruby', 35, 70); // يتردد سعر الياقوت بين 35 و 70
+        updateResourcePrice('coal', 8, 20);   // يتردد سعر الفحم بين 8 و 20
+        drawMarketChart();                   // رسم المنحنى مجدداً
+    }, 4000);
+}
+
+function updateResourcePrice(type, min, max) {
+    let item = marketState[type];
+    let changePercent = (Math.random() * 0.12 - 0.06); // تغيير عشوائي بين -6% و +6%
+    let newPrice = Math.round(item.price * (1 + changePercent));
+
+    // ضمان أن السعر لا يخرج عن الحد الأدنى والأقصى
+    newPrice = Math.max(min, Math.min(max, newPrice));
+
+    item.change = (((newPrice - item.price) / item.price) * 100).toFixed(1);
+    item.price = newPrice;
+    
+    // حفظ تاريخ الأسعار للرسم البياني (نحتفظ بـ 10 نقاط فقط)
+    item.history.push(newPrice);
+    if (item.history.length > 10) item.history.shift();
+
+    // تحديث الأرقام على الشاشة
+    const priceEl = document.getElementById(`${type}-price`);
+    if (priceEl) priceEl.innerText = item.price;
+
+    if (type === 'ruby') {
+        const changeEl = document.getElementById('ruby-price-change');
+        if (changeEl) {
+            changeEl.innerText = `${item.change >= 0 ? '+' : ''}${item.change}%`;
+            changeEl.className = `price-change ${item.change >= 0 ? 'up' : 'down'}`;
+        }
+    }
+}
+
+// 2. دالة البيع والشراء
+function tradeResource(type, action) {
+    let item = marketState[type];
+    
+    if (action === 'buy') {
+        if (gameData.balance >= item.price) {
+            gameData.balance -= item.price;
+            gameData.inventory[type]++;
+            showToast(`✅ تم شراء 1 ${type === 'ruby' ? 'ياقوت' : 'فحم'}`);
+        } else {
+            showToast("❌ رصيدك غير كافٍ للشراء!", "error");
+        }
+    } else if (action === 'sell') {
+        if (gameData.inventory[type] > 0) {
+            gameData.inventory[type]--;
+            gameData.balance += item.price;
+            showToast(`💰 تم بيع 1 ${type === 'ruby' ? 'ياقوت' : 'فحم'} بـ ${item.price}`);
+        } else {
+            showToast("❌ لا تملك هذا المورد لبيعه!", "error");
+        }
+    }
+
+    // تحديث الرصيد وقيم المخزن في الواجهة
+    updateBalanceDisplay();
+    const ownedEl = document.getElementById(`${type}-owned`);
+    if (ownedEl) ownedEl.innerText = gameData.inventory[type];
+}
+
+// 3. رسم الرسم البياني المباشر (HTML5 Canvas Chart)
+function drawMarketChart() {
+    const canvas = document.getElementById('marketChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const data = marketState.ruby.history;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const margin = 20;
+    const width = canvas.width - margin * 2;
+    const height = canvas.height - margin * 2;
+    
+    const minVal = Math.min(...data) - 2;
+    const maxVal = Math.max(...data) + 2;
+
+    // رسم الخط
+    ctx.beginPath();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = marketState.ruby.change >= 0 ? '#10b981' : '#ef4444';
+
+    data.forEach((val, index) => {
+        const x = margin + (index / (data.length - 1)) * width;
+        const y = canvas.height - margin - ((val - minVal) / (maxVal - minVal)) * height;
+        
+        if (index === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+}
+
+// تشغيل البورصة فور تحميل اللعبة
+document.addEventListener('DOMContentLoaded', () => {
+    startMarketFluctuations();
+});
