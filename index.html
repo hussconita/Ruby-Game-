@@ -222,21 +222,93 @@
 
         
         /* ⚠️ احتفظ بباقي أكواد الـ CSS القديمة الخاصة بالمهام والترقيات والأصدقاء تحت هذا السطر ⚠️ */
+        /* تنسيق صفحة الترقيات */
+.section-title {
+    color: #fbd462;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 20px;
+    text-shadow: 0 0 10px rgba(251, 212, 98, 0.4);
+}
 
+.upgrade-card {
+    background: rgba(22, 28, 36, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(251, 212, 98, 0.2);
+    border-radius: 18px;
+    padding: 15px;
+    margin-bottom: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.upgrade-card:hover {
+    border-color: #fbd462;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(251, 212, 98, 0.2);
+}
+
+.upgrade-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.upgrade-icon {
+    font-size: 32px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.upgrade-info h3 {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+    color: #fbd462;
+}
+
+.upgrade-info p {
+    margin: 0;
+    font-size: 12px;
+    color: #a0aec0;
+}
+
+.upgrade-info small {
+    color: #718096;
+    font-size: 11px;
+}
+
+.upgrade-btn {
+    background: linear-gradient(135deg, #fbd462, #f59e0b);
+    border: none;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: bold;
+    color: #1a202c;
+    cursor: pointer;
+    font-size: 13px;
+    box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+    transition: transform 0.2s ease;
+}
+
+.upgrade-btn:active {
+    transform: scale(0.95);
+}
+        
         /* --- 5. الكروت (ترقيات، مهام، أصدقاء) --- */
         .upgrades-list, .tasks-list, .friends-list {
             padding: 20px;
         }
 
-        .section-title {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            color: #fca311;
-            text-align: center;
-            font-weight: bold;
-        }
 
-        .upgrade-card, .task-card, .friend-card {
+
+         .task-card, .friend-card {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -247,28 +319,28 @@
             margin-bottom: 12px;
         }
 
-        .upgrade-info, .task-info, .friend-info {
+        .task-info, .friend-info {
             display: flex;
             align-items: center;
             gap: 15px;
         }
 
-        .upgrade-icon, .task-icon, .friend-icon {
+        .task-icon, .friend-icon {
             font-size: 2.2rem;
         }
 
-        .upgrade-info h3, .task-info h3, .friend-info h3 {
+        .task-info h3, .friend-info h3 {
             font-size: 1rem;
             margin-bottom: 2px;
             color: #ffffff;
         }
 
-        .upgrade-info p, .task-info p, .friend-info p {
+        .task-info p, .friend-info p {
             font-size: 0.8rem;
             color: #aaaaaa;
         }
 
-        .buy-button, .claim-button, .share-btn {
+        .claim-button, .share-btn {
             background-color: #fca311;
             color: #14213d;
             border: none;
@@ -279,7 +351,7 @@
             transition: transform 0.1s;
         }
 
-        .buy-button:active, .claim-button:active, .share-btn:active {
+        .claim-button:active, .share-btn:active {
             transform: scale(0.95);
         }
 
@@ -360,33 +432,37 @@
     
     <div id="upgrades-screen" class="hidden">
         <!-- كود شاشة الترقيات الخاص بك -->
-        <div class="upgrades-list">
-                <h2 class="section-title">تطوير أدوات التعدين</h2>
-                <div class="upgrade-card">
-                    <div class="upgrade-info">
-                        <span class="upgrade-icon">⛏️</span>
-                        <div>
-                            <h3>معول حديدي</h3>
-                            <p>يزيد قوة النقرة (+1 نقدة)</p>
-                        </div>
-                    </div>
-                    <button class="buy-button" id="buy-click-upgrade">
-                        <span class="cost-val" id="click-upgrade-cost">50</span> 💰
-                    </button>
-                </div>
-                <div class="upgrade-card">
-                    <div class="upgrade-info">
-                        <span class="upgrade-icon">🌋</span>
-                        <div>
-                            <h3>فرن مطور</h3>
-                            <p>يزيد التعدين التلقائي (+50/ساعة)</p>
-                        </div>
-                    </div>
-                    <button class="buy-button" id="buy-passive-upgrade">
-                        <span class="cost-val" id="passive-upgrade-cost">200</span> 💰
-                    </button>
-                </div>
+        <!-- ================= قسم الترقيات (Upgrades Section) ================= -->
+<div id="upgrades-section" class="game-section">
+    <h2 class="section-title">⚡ تطوير أدوات التعدين</h2>
+    
+    <!-- بطاقة معول حديدي (قوة النقرة) -->
+    <div class="upgrade-card" onclick="buyUpgrade('pickaxe')">
+        <div class="upgrade-info">
+            <span class="upgrade-icon">⛏️</span>
+            <div>
+                <h3>معول حديدي</h3>
+                <p>يزيد قوة النقرة (+<span id="pickaxe-power-add">1</span>)</p>
+                <small>المستوى: <span id="pickaxe-level">1</span></small>
+            </div>
         </div>
+        <button class="upgrade-btn"><span id="pickaxe-cost">50</span> 💰</button>
+    </div>
+
+    <!-- بطاقة فرن مطور (الربح التلقائي) -->
+    <div class="upgrade-card" onclick="buyUpgrade('furnace')">
+        <div class="upgrade-info">
+            <span class="upgrade-icon">🌋</span>
+            <div>
+                <h3>فرن مطور</h3>
+                <p>يزيد التعدين التلقائي (+50/ساعة)</p>
+                <small>المستوى: <span id="furnace-level">1</span></small>
+            </div>
+        </div>
+        <button class="upgrade-btn"><span id="furnace-cost">200</span> 💰</button>
+    </div>
+</div>
+
     </div>
 
     <div id="tasks-screen" class="hidden">
