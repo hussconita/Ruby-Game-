@@ -96,9 +96,56 @@ function buyUpgrade(type) {
 }
 
 // تحديث عرض الرصيد في الشاشة الرئيسية
+// دالة واحدة متكاملة لتحديث جميع عناصر الرصيد والواجهة
 function updateBalanceDisplay() {
-    const balanceEl = document.getElementById('balance-display'); // تأكد من مطابقة الـ ID لديك
-    if (balanceEl) balanceEl.innerText = gameData.balance;
+    // 1. تحديث رقم الرصيد في الشاشة الرئيسية
+    const balanceEl = document.getElementById('balance-display');
+    if (balanceEl) {
+        balanceEl.innerText = gameData.balance;
+    }
+
+    // 2. تحديث رقم الربح في الساعة (إن وجد)
+    const profitEl = document.getElementById('profit-display');
+    if (profitEl) {
+        profitEl.innerText = `${gameData.profitPerHour}+`;
+    }
+}
+
+// دالة شراء الترقية المحدثة
+function buyUpgrade(type) {
+    let item = gameData[type];
+    
+    // التاكد من وجود رصيد كافٍ
+    if (gameData.balance >= item.cost) {
+        // 1. خصم السعر من الرصيد
+        gameData.balance -= item.cost;
+        
+        // 2. تطبيق تأثير الترقية وتكبير السعر للمرة القادمة
+        if (type === 'pickaxe') {
+            gameData.clickPower += item.powerBonus;
+            item.level++;
+            item.cost = Math.floor(item.cost * item.costMultiplier);
+            
+            document.getElementById('pickaxe-level').innerText = item.level;
+            document.getElementById('pickaxe-cost').innerText = item.cost;
+            document.getElementById('pickaxe-power-add').innerText = gameData.clickPower;
+        } 
+        else if (type === 'furnace') {
+            gameData.profitPerHour += item.profitBonus;
+            item.level++;
+            item.cost = Math.floor(item.cost * item.costMultiplier);
+            
+            document.getElementById('furnace-level').innerText = item.level;
+            document.getElementById('furnace-cost').innerText = item.cost;
+        }
+        
+        // 3. تحديث الرصيد على الشاشة فوراً
+        updateBalanceDisplay();
+        
+        showToast("✨ تمت الترقية بنجاح!");
+    } else {
+        showToast("❌ رصيدك غير كافٍ!", "error");
+    }
 }
 
 // دالة إظهار التنبيهات المؤقتة (Toast)
@@ -220,20 +267,57 @@ setInterval(() => {
 }, 10000);
 
 // 4. النقر اليدوي
-mainClicker.addEventListener('pointerdown', (event) => {
-    score += clickPower;
-    scoreDisplay.textContent = Math.floor(score);
+// دالة إظهار الرقم المتطاير عند النقر
+function showFloatingNumber(event, amount) {
+    // 1. تحديد مكان النقلة على الشاشة (سواء بالماوس أو بالتاتش في الموبايل)
+    let x, y;
+    if (event.touches && event.touches.length > 0) {
+        x = event.touches[0].clientX;
+        y = event.touches[0].clientY;
+    } else if (event.clientX && event.clientY) {
+        x = event.clientX;
+        y = event.clientY;
+    } else {
+        // مكان افتراضي في منتصف السندان إذا لم تتوفر إحداثيات
+        const anvil = document.querySelector('.clicker-frame');
+        const rect = anvil.getBoundingClientRect();
+        x = rect.left + rect.width / 2;
+        y = rect.top + rect.height / 2;
+    }
 
-    if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+    // 2. إنشاء عنصر الرقم
+    const floatEl = document.createElement('div');
+    floatEl.className = 'floating-number';
+    floatEl.innerText = `+${amount}`;
+    
+    // وضع الرقم في مكان النقلة بالضبط على الشاشة
+    floatEl.style.left = `${x}px`;
+    floatEl.style.top = `${y}px`;
 
-    const floatElement = document.createElement('div');
-    floatElement.classList.add('floating-number');
-    floatElement.textContent = `+${clickPower}`;
-    floatElement.style.left = `${event.clientX}px`;
-    floatElement.style.top = `${event.clientY - 20}px`;
-    document.querySelector('.clicker-area').appendChild(floatElement);
-    setTimeout(() => floatElement.remove(), 1000);
-});
+    // إضافته للـ body مباشرة حتى لا يختفي خلف أي عنصر أو يقصه overflow
+    document.body.appendChild(floatEl);
+
+    // حذفه بعد انتهاء الحركة
+    setTimeout(() => {
+        floatEl.remove();
+    }, 800);
+}
+
+// ================= طريقة الاستدعاء عند الضغط على السندان =================
+const anvilElement = document.querySelector('.clicker-frame');
+
+if (anvilElement) {
+    // دعم النقر والتاتش المباشر على الموبايل
+    anvilElement.addEventListener('pointerdown', function(e) {
+        // زيادة الرصيد بقوة النقرة الحالية
+        gameData.balance += gameData.clickPower;
+        updateBalanceDisplay();
+        
+        // إظهار الرقم المتطاير
+        showFloatingNumber(e, gameData.clickPower);
+    });
+}
+
 
 // 5. نظام التنقل والتبديل بين الـ 4 شاشات
 function showScreen(activeBtn, screenToShow) {
