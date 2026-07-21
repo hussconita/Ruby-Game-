@@ -1,5 +1,16 @@
 const BACKEND_URL = "https://ruby-backend-lime.vercel.app";
 
+let telegramId = "123456"; // افتراضي للتجربة خارج تليجرام
+let firstName = "Player";
+
+if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe?.user) {
+    const tgUser = window.Telegram.WebApp.initDataUnsafe.user;
+    telegramId = tgUser.id;
+    firstName = tgUser.first_name;
+    console.log(`Welcome ${firstName} (${telegramId})`);
+}
+
+
 // تهيئة وتكبير الشاشة في تليجرام
 if (window.Telegram && window.Telegram.WebApp) {
     const tg = window.Telegram.WebApp;
