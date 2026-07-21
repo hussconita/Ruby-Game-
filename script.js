@@ -1,7 +1,12 @@
 const BACKEND_URL = "https://ruby-backend-lime.vercel.app";
 
-const tg = window.Telegram?.WebApp || { expand: () => {}, HapticFeedback: null, initData: "" };
-if (tg.expand) tg.expand(); 
+// تهيئة وتكبير الشاشة في تليجرام
+if (window.Telegram && window.Telegram.WebApp) {
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand(); // فتح اللعبة ملء الشاشة
+}
+
 
 // عناصر الشاشات
 const scoreDisplay = document.getElementById('score');
