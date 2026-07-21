@@ -128,37 +128,87 @@
             100% { opacity: 0; transform: translateY(-70px) scale(1.2); }
         }
 
-        /* ================= 4. ألوان القائمة السفلية ================= */
-        .bottom-nav {
-    position: fixed;         /* تثبيت العنصر على الشاشة */
-    bottom: 0;               /* لصق العنصر في الحافة السفلية */
+        /* ================= تصميم القائمة السفلية (Glassmorphism) ================= */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
     left: 0;
-    width: 100%;             /* جعل القائمة بعرض الشاشة بالكامل */
-    background-color: #161c24; 
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    z-index: 999;            /* إبقاء القائمة فوق أي عنصر آخر في اللعبة */
-    
-    /* تنسيق الأزرار بجوار بعضها (أضفها إذا لم تكن موجودة) */
+    width: 100%;
+    /* خلفية داكنة جداً مع شفافية */
+    background: rgba(15, 18, 25, 0.85); 
+    /* تأثير الزجاج المغبش الرائع */
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    /* خط علوي ذهبي خفيف */
+    border-top: 1px solid rgba(251, 212, 98, 0.2); 
+    /* حواف دائرية من الأعلى فقط */
+    border-radius: 30px 30px 0 0; 
     display: flex;
     justify-content: space-around;
     align-items: center;
-    padding: 10px 0;         /* مسافة داخلية لضبط حجم القائمة */
-        }
-        
-        nav-item {
-    color: olive;
-    background-color: grey;
-    border: 2px solid olive;
-    border-radius: 5px;
-    text-align: center;
-    cursor: pointer;
-    /* التخلص من تأثير التحديد الأزرق عند الضغط في الهواتف */
-    -webkit-tap-highlight-color: transparent; 
+    padding: 15px 5px 20px 5px; /* مسافات داخلية مريحة للإصبع */
+    z-index: 1000;
+    box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.7); /* ظل علوي يبرز القائمة */
 }
 
-.nav-item.active {
-    color: #fbd462; /* تلوين الأيقونة المفعلة باللون الذهبي */
+/* تصميم الأزرار نفسها */
+.nav-item {
+    background: transparent;
+    border: none;
+    outline: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: #6a788e; /* لون رمادي مزرق باهت للعناصر غير المفعلة */
+    font-family: 'Arial', sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease; /* نعومة الحركة */
+    -webkit-tap-highlight-color: transparent; /* إخفاء مربع النقر الأزرق في الهواتف */
+    flex: 1; 
+    position: relative; /* ضروري لمؤشر التفعيل السفلي */
 }
+
+/* تنسيق الأيقونات (الإيموجي) */
+.nav-icon {
+    font-size: 24px;
+    filter: grayscale(100%) opacity(0.6); /* جعلها باهتة وبدون ألوان في الوضع العادي */
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* تأثير ارتداد عند النقر */
+}
+
+/* ================= تأثير العنصر النشط (Active) ================= */
+.nav-item.active {
+    color: #fbd462; /* تحويل النص للون الذهبي الساطع */
+}
+
+.nav-item.active .nav-icon {
+    filter: grayscale(0%) opacity(1); /* إعادة الألوان الكاملة للإيموجي */
+    transform: translateY(-5px) scale(1.15); /* رفع الأيقونة للأعلى وتكبيرها */
+    text-shadow: 0 0 15px rgba(251, 212, 98, 0.6); /* توهج خلف الأيقونة */
+}
+
+/* المؤشر المضيء أسفل الزر النشط */
+.nav-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: -8px; /* أسفل الكلمة */
+    width: 20px;
+    height: 4px;
+    background: #fbd462;
+    border-radius: 5px;
+    box-shadow: 0 0 10px #fbd462;
+    animation: glowUp 0.3s ease forwards;
+}
+
+/* حركة بسيطة لظهور المؤشر */
+@keyframes glowUp {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
         
         /* ⚠️ احتفظ بباقي أكواد الـ CSS القديمة الخاصة بالمهام والترقيات والأصدقاء تحت هذا السطر ⚠️ */
 
@@ -381,26 +431,26 @@
         </div>
     </div>
 
-    <!-- ================= القائمة السفلية (احتفظ بكودك هنا كما هو) ================= -->
-    <!-- <nav class="bottom-nav"> ... </nav> -->
-    <nav class="bottom-nav">
-            <button class="nav-item active" id="btn-mine">
-                <span class="icon">⛏️</span>
-                <span>تعدين</span>
-            </button>
-            <button class="nav-item" id="btn-upgrades">
-                <span class="icon">🚀</span>
-                <span>ترقيات</span>
-            </button>
-            <button class="nav-item" id="btn-tasks">
-                <span class="icon">📋</span>
-                <span>مهام</span>
-            </button>
-            <button class="nav-item" id="btn-friends">
-                <span class="icon">👥</span>
-                <span>أصدقاء</span>
-            </button>
-    </nav>
+    <!-- ================= القائمة السفلية ================= -->
+<nav class="bottom-nav">
+    <button id="btn-friends" class="nav-item">
+        <span class="nav-icon">👥</span>
+        <span class="nav-text">أصدقاء</span>
+    </button>
+    <button id="btn-tasks" class="nav-item">
+        <span class="nav-icon">📋</span>
+        <span class="nav-text">مهام</span>
+    </button>
+    <button id="btn-upgrades" class="nav-item">
+        <span class="nav-icon">🚀</span>
+        <span class="nav-text">ترقيات</span>
+    </button>
+    <button id="btn-mine" class="nav-item active">
+        <span class="nav-icon">⛏️</span>
+        <span class="nav-text">تعدين</span>
+    </button>
+</nav>
+
 
     <!-- ربط ملف الجافاسكريبت -->
     <script src="script.js"></script>
