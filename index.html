@@ -392,7 +392,7 @@
             margin-bottom: 15px;
         }
 
-        .invite-box .share-btn {
+        .invite-box .invite-btn {
             width: 100%;
             padding: 12px;
             font-size: 1rem;
@@ -496,9 +496,12 @@
 </head>
 <body>
 
-    <!-- ================= شاشة التعدين (تظهر وتختفي ككتلة واحدة) ================= -->
-    <div id="mine-screen">
-        <!-- الإحصائيات -->
+    <!-- منطقة الشاشات (تأكد إنهم إخوة ومش جوة بعض) -->
+<main id="game-container">
+
+    <!-- 1. شاشة التعدين (السندان) -->
+    <div id="mine-screen" class="game-section">
+        <!-- كود السندان والأرقام هنا -->
         <div class="header-stats">
             <div class="stat-box left">
                 <span class="stat-title">الربح/ساعة</span>
@@ -518,20 +521,12 @@
                 <img src="forge-img.jpg" id="forge-img" alt="Forge" />
             </div>
         </div>
-        
     </div>
-    <!-- ================= نهاية شاشة التعدين ================= -->
-    
 
-    <!-- ================= باقي شاشات اللعبة (احتفظ بأكوادك هنا كما هي) ================= -->
-    
-    <div id="upgrades-screen" class="hidden">
-        <!-- كود شاشة الترقيات الخاص بك -->
-
-        
-        <!-- ================= قسم الترقيات (Upgrades Section) ================= -->
-<div id="upgrades-section" class="game-section">
-    <h2 class="section-title">⚡ تطوير أدوات التعدين</h2>
+    <!-- 2. شاشة الترقيات -->
+    <div id="upgrades-section" class="game-section hidden">
+        <!-- كود الترقيات هنا -->
+        <h2 class="section-title">⚡ تطوير أدوات التعدين</h2>
     
     <!-- بطاقة معول حديدي (قوة النقرة) -->
     <div class="upgrade-card" onclick="buyUpgrade('pickaxe')">
@@ -557,13 +552,13 @@
             </div>
         </div>
         <button class="upgrade-btn"><span id="furnace-cost">200</span> 💰</button>
+      </div>
     </div>
-</div>
 
-    </div>
-        <!-- ================= قسم السوق والمضاربة ================= -->
-<div id="market-section" class="game-section">
-    <h2 class="section-title">📈 بورصة الموارد النادرة</h2>
+    <!-- 3. شاشة السوق -->
+    <div id="market-section" class="game-section hidden">
+        <!-- كود الرسم البياني والبيع والشراء هنا -->
+        <h2 class="section-title">📈 بورصة الموارد النادرة</h2>
 
     <!-- شاشة الرسم البياني (Chart) -->
     <div class="chart-container">
@@ -610,10 +605,11 @@
         </div>
 
     </div>
-</div>
+ </div>
 
-        <div id="tasks-screen" class="hidden">
-        <!-- كود شاشة المهام الخاص بك -->
+    <!-- 4. شاشة المهام -->
+    <div id="tasks-screen" class="game-section hidden">
+        <!-- كود المهام هنا -->
         <div class="tasks-list">
                 <h2 class="section-title">مهام مجتمعية</h2>
                 <div class="task-card">
@@ -639,15 +635,16 @@
         </div>
     </div>
 
-    <div id="friends-screen" class="hidden">
-        <!-- كود شاشة الأصدقاء الخاص بك -->
+    <!-- 5. شاشة الأصدقاء -->
+    <div id="friends-screen" class="game-section hidden">
+        <!-- كود الأصدقاء ورابط الدعوة هنا -->
         <div class="friends-list">
                 <h2 class="section-title">دعوة الأصدقاء</h2>
                 
                 <div class="invite-box">
                     <h4>انشر اللعبة واربح الملايين!</h4>
                     <p>ستحصل أنت وصديقك على +5,000 عملة فور انضمامه للعبة عن طريقك.</p>
-                    <button class="share-btn" id="btn-invite-friend">دعوة صديق 🔗</button>
+                    <button class="invite-btn" onclick="inviteFriend()">دعوة صديق 🔗</button>
                 </div>
 
                 <p class="friends-count">قائمة أصدقائك (0):</p>
@@ -664,6 +661,8 @@
                 </div>
         </div>
     </div>
+
+</main>
 
 <!-- ================= القائمة السفلية المحدثة ================= -->
 <nav class="bottom-nav">
