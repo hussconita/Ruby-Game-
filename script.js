@@ -381,7 +381,7 @@ document.getElementById('buy-passive-upgrade').addEventListener('click', () => {
 // 7. نظام المهام
 document.getElementById('task-tg').addEventListener('click', () => {
     if (!isTgTaskDone) {
-        if (tg.openTelegramLink) tg.openTelegramLink('https://t.me/telegram'); 
+        if (tg.openTelegramLink) tg.openTelegramLink('https://t.me/coffee_me_you'); 
         score += 1000;
         isTgTaskDone = true;
         localStorage.setItem('task_tg_done', 'true');
@@ -401,21 +401,49 @@ document.getElementById('task-yt').addEventListener('click', () => {
     }
 });
 
-// 8. نظام دعوة الأصدقاء والمشاركة الفورية
-document.getElementById('btn-invite-friend').addEventListener('click', () => {
-    const userId = tg.initDataUnsafe?.user?.id || "test_user";
-    const botLink = `https://t.me/YOUR_BOT_USERNAME/app?startapp=ref_${userId}`;
-    const inviteText = encodeURIComponent("🔥 العب معي في لعبة Ember الممتعة! ابنِ فرن التعدين الخاص بك واكسب عملات ذهبية مجانية فوراً! 💰");
+//8. ================= نظام دعوة الأصدقاء والمهام =================
+
+// دالة نسخ رابط الإحالة (Referral Link)
+window.inviteFriend = function() {
+    // محاكاة رابط إحالة خاص باللاعب
+    const userId = Math.floor(Math.random() * 1000000); 
+    const inviteLink = `https://t.me/RubyForgeBot?start=${userId}`;
     
-    if (tg.openTelegramLink) {
-        tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(botLink)}&text=${inviteText}`);
-    }
-});
+    // نسخ الرابط للحافظة
+    navigator.clipboard.writeText(inviteLink).then(() => {
+        alert("🔗 تم نسخ رابط الدعوة بنجاح! شاركه مع أصدقائك لتربح 5000 عملة.");
+    }).catch(err => {
+        alert("حدث خطأ أثناء نسخ الرابط.");
+    });
+};
+
+// دالة تنفيذ مهمة (مثل الانضمام لقناة تليجرام)
+window.completeTask = function(reward, buttonElement) {
+    // فتح الرابط (مثال: قناة تليجرام)
+    window.open("https://t.me/coffee_me_you", "_blank");
+    
+    // إضافة المكافأة بعد 3 ثواني (محاكاة التأكد من المهمة)
+    setTimeout(() => {
+        gameData.balance += reward;
+        let balanceEl = document.getElementById('balance');
+        if (balanceEl) balanceEl.innerText = Math.floor(gameData.balance);
+        
+        // تغيير شكل الزر لـ "مكتمل"
+        buttonElement.innerText = "✅ اكتملت";
+        buttonElement.disabled = true;
+        buttonElement.style.background = "#4b5563";
+        
+        alert(`🎉 مبروك! حصلت على ${reward} عملة.`);
+    }, 500);
+};
+
 
 // 9. تشغيل جلب البيانات تلقائياً عند فتح اللعبة
 loadPlayerData();
 
 //10. إضافة الموارد والمخزن إلى بيانات اللعبة الرئيسية
+gameData.inventory = gameData.inventory || { ruby: 0, coal: 0 };
+// ================= نظام السوق المحدث والآمن =================
 gameData.inventory = gameData.inventory || { ruby: 0, coal: 0 };
 
 let marketState = {
@@ -423,31 +451,31 @@ let marketState = {
     coal: { price: 12, history: [10, 11, 12, 11, 12], change: 0 }
 };
 
-// 1. دالة تحديث الأسعار بشكل حي (شغالة كل 4 ثوانٍ)
-function startMarketFluctuations() {
+// تشغيل السوق (تأكد إنها بتشتغل بعد تحميل الصفحة)
+document.addEventListener('DOMContentLoaded', () => {
+    // رسم الشارت المبدئي
+    setTimeout(drawMarketChart, 500); 
+    
+    // تحديث الأسعار كل 4 ثواني
     setInterval(() => {
-        updateResourcePrice('ruby', 35, 70); // يتردد سعر الياقوت بين 35 و 70
-        updateResourcePrice('coal', 8, 20);   // يتردد سعر الفحم بين 8 و 20
-        drawMarketChart();                   // رسم المنحنى مجدداً
+        updateResourcePrice('ruby', 35, 70);
+        updateResourcePrice('coal', 8, 20);
+        drawMarketChart();
     }, 4000);
-}
+});
 
 function updateResourcePrice(type, min, max) {
     let item = marketState[type];
-    let changePercent = (Math.random() * 0.12 - 0.06); // تغيير عشوائي بين -6% و +6%
+    let changePercent = (Math.random() * 0.12 - 0.06); 
     let newPrice = Math.round(item.price * (1 + changePercent));
 
-    // ضمان أن السعر لا يخرج عن الحد الأدنى والأقصى
     newPrice = Math.max(min, Math.min(max, newPrice));
-
     item.change = (((newPrice - item.price) / item.price) * 100).toFixed(1);
     item.price = newPrice;
     
-    // حفظ تاريخ الأسعار للرسم البياني (نحتفظ بـ 10 نقاط فقط)
     item.history.push(newPrice);
     if (item.history.length > 10) item.history.shift();
 
-    // تحديث الأرقام على الشاشة
     const priceEl = document.getElementById(`${type}-price`);
     if (priceEl) priceEl.innerText = item.price;
 
@@ -460,51 +488,53 @@ function updateResourcePrice(type, min, max) {
     }
 }
 
-// 2. دالة البيع والشراء
-function tradeResource(type, action) {
+// دالة البيع والشراء (تم إضافة تنبيهات بسيطة لو دالة showToast مش موجودة)
+window.tradeResource = function(type, action) {
     let item = marketState[type];
     
     if (action === 'buy') {
         if (gameData.balance >= item.price) {
             gameData.balance -= item.price;
             gameData.inventory[type]++;
-            showToast(`✅ تم شراء 1 ${type === 'ruby' ? 'ياقوت' : 'فحم'}`);
+            alert(`✅ تم شراء ${type} بنجاح!`); // نستخدم alert كبديل مؤقت لو Toast فيها مشكلة
         } else {
-            showToast("❌ رصيدك غير كافٍ للشراء!", "error");
+            alert("❌ رصيدك غير كافٍ للشراء!");
         }
     } else if (action === 'sell') {
         if (gameData.inventory[type] > 0) {
             gameData.inventory[type]--;
             gameData.balance += item.price;
-            showToast(`💰 تم بيع 1 ${type === 'ruby' ? 'ياقوت' : 'فحم'} بـ ${item.price}`);
+            alert(`💰 تم بيع ${type} بـ ${item.price}`);
         } else {
-            showToast("❌ لا تملك هذا المورد لبيعه!", "error");
+            alert("❌ لا تملك هذا المورد لبيعه!");
         }
     }
 
-    // تحديث الرصيد وقيم المخزن في الواجهة
-    updateBalanceDisplay();
+    // تحديث الرصيد في الشاشة
+    let balanceEl = document.getElementById('balance');
+    if (balanceEl) balanceEl.innerText = Math.floor(gameData.balance);
+
     const ownedEl = document.getElementById(`${type}-owned`);
     if (ownedEl) ownedEl.innerText = gameData.inventory[type];
-}
+};
 
-// 3. رسم الرسم البياني المباشر (HTML5 Canvas Chart)
 function drawMarketChart() {
     const canvas = document.getElementById('marketChart');
-    if (!canvas) return;
+    // منع الخطأ إذا كانت الشاشة مخفية
+    if (!canvas || canvas.offsetParent === null) return; 
+    
     const ctx = canvas.getContext('2d');
     const data = marketState.ruby.history;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const margin = 20;
+    const margin = 10;
     const width = canvas.width - margin * 2;
     const height = canvas.height - margin * 2;
     
     const minVal = Math.min(...data) - 2;
     const maxVal = Math.max(...data) + 2;
 
-    // رسم الخط
     ctx.beginPath();
     ctx.lineWidth = 3;
     ctx.strokeStyle = marketState.ruby.change >= 0 ? '#10b981' : '#ef4444';
@@ -512,12 +542,12 @@ function drawMarketChart() {
     data.forEach((val, index) => {
         const x = margin + (index / (data.length - 1)) * width;
         const y = canvas.height - margin - ((val - minVal) / (maxVal - minVal)) * height;
-        
         if (index === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
     });
     ctx.stroke();
 }
+
 
 // تشغيل البورصة فور تحميل اللعبة
 document.addEventListener('DOMContentLoaded', () => {
